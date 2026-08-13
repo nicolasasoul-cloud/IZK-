@@ -7,6 +7,11 @@ export type Artwork = {
   gradient: string;
   whaleTone: "gold" | "glow" | "ink";
   price: number;
+  /** A Stripe Payment Link URL for this piece. Unset = "Buy print" falls
+   * back to a mailto inquiry, since static hosting can't create Checkout
+   * Sessions on the fly. Create one per product in the Stripe dashboard
+   * (Payment Links) once real prices/art are set. */
+  stripeLink?: string;
 };
 
 /**

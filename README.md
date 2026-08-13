@@ -1,7 +1,8 @@
 # IZK
 
 Brand site for IZK — "a rare, wise whale moving through the world." Built
-with Next.js (App Router) and Tailwind CSS.
+with Next.js (App Router) and Tailwind CSS, exported as a fully static
+site (no server runtime — required for Cloudflare Pages hosting).
 
 ## Getting started
 
@@ -21,23 +22,41 @@ Open [http://localhost:3000](http://localhost:3000).
 - `src/data/artwork.ts` — the art/product catalog. Replace placeholder
   entries with real pieces (title, medium, price, and swap the gradient
   for a real image) as they're ready
-- `src/app/api/checkout/` — Stripe Checkout session creation for the shop
-- `src/app/api/contact/` — contact form handler (uses Resend)
+- `src/components/ShopGrid.tsx` — "Buy print" links to each artwork's
+  `stripeLink` (a Stripe Payment Link), or falls back to a mailto inquiry
+  if unset
+- `src/components/ContactForm.tsx` — posts to Formspree if configured,
+  otherwise falls back to opening a mailto: draft
+
+## Deploying to Cloudflare Pages
+
+This site builds to static HTML/CSS/JS (`output: "export"` in
+`next.config.ts`) — Cloudflare Pages has no Next.js server runtime, so a
+normal server build 404s there. In the Cloudflare Pages project settings:
+
+- **Build command:** `npm run build`
+- **Build output directory:** `out`
+- **Framework preset:** Next.js (Static HTML Export), if offered — otherwise
+  "None" with the settings above
+
+There's no `src/app/api/` directory and no server-only environment
+variables to set, since a static export can't run server code (route
+handlers, Stripe Checkout session creation, etc. don't work here — that's
+why the shop/contact features below use Payment Links and Formspree
+instead).
 
 ## Environment variables
 
 Copy `.env.example` to `.env.local` and fill in:
 
-- `STRIPE_SECRET_KEY` — enables real checkout on the Shop page. Without
-  it, "Buy print" shows a friendly "not connected yet" message instead of
-  failing.
-- `RESEND_API_KEY` / `CONTACT_TO_EMAIL` — enables the About page contact
-  form. Same graceful fallback if unset.
+- `NEXT_PUBLIC_FORMSPREE_ENDPOINT` — enables the About page contact form's
+  in-page submit via [Formspree](https://formspree.io). Without it, the
+  form falls back to a mailto: link — nothing breaks.
 
-## Deploying
-
-Deploys cleanly to [Vercel](https://vercel.com/new) — connect the repo and
-add the environment variables above in the project settings.
+For the shop, add a `stripeLink` (a Stripe [Payment
+Link](https://dashboard.stripe.com/payment-links)) to each entry in
+`src/data/artwork.ts` once real prices are set — no environment variable
+needed, since checkout is just a link to Stripe's hosted page.
 
 ## Migrating content from Squarespace
 

@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { CONTACT_EMAIL } from "@/config/site";
 
 type Status = "idle" | "sending" | "sent" | "error";
+
+const FORMSPREE_ENDPOINT = process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT;
 
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
@@ -10,22 +13,33 @@ export default function ContactForm() {
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("sending");
-    setMessage(null);
 
     const form = e.currentTarget;
-    const body = Object.fromEntries(new FormData(form));
+    const data = Object.fromEntries(new FormData(form)) as {
+      name: string;
+      email: string;
+      message: string;
+    };
 
+    if (!FORMSPREE_ENDPOINT) {
+      const body = `${data.message}\n\n— ${data.name} (${data.email})`;
+      window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+        `Message from ${data.name}`,
+      )}&body=${encodeURIComponent(body)}`;
+      return;
+    }
+
+    setStatus("sending");
+    setMessage(null);
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        headers: { Accept: "application/json" },
+        body: form as unknown as FormData,
       });
-      const data = await res.json();
       if (!res.ok) {
         setStatus("error");
-        setMessage(data.error ?? "Something went wrong. Try again shortly.");
+        setMessage("Something went wrong. Try again shortly.");
         return;
       }
       setStatus("sent");
