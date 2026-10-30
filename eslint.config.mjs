@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Agent skills (HyperFrames + video-editor): vendored scripts and sample code.
+    ".claude/**",
   ]),
 ]);
 

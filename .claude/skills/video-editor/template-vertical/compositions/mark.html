@@ -1,0 +1,22 @@
+<template>
+  <style>
+    @font-face { font-family: "Work Sans"; font-weight: 600; src: url("assets/fonts/work-sans-latin-600-normal.woff2") format("woff2"); }
+    #root { position: absolute; inset: 0; }
+    #mark-box { position: absolute; top: 230px; left: 0; right: 0; text-align: center; }
+    #mark-logo { width: 170px; height: 170px; }
+    #mark-name { margin-top: 14px; font-family: "Work Sans"; font-weight: 600; font-size: 30px; letter-spacing: 0.32em;
+      text-transform: uppercase; color: #7a2e22; }
+  </style>
+  <div id="root" data-composition-id="mark" data-width="1080" data-height="1920">
+    <div id="mark-box">
+      <img id="mark-logo" src="assets/logo.png" alt="Chicana Hippie" />
+      <div id="mark-name">Chicana Hippie</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#mark-logo", { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0);
+    tl.fromTo("#mark-name", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.15);
+    window.__timelines["mark"] = tl;
+  </script>
+</template>
